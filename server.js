@@ -100,7 +100,7 @@ function addRole() {
           name: "department_id",
           message: "Which department does the new role belong to?",
           choices: departments.map((department) => ({
-            name: department.name,
+            name: department.department_name,
             value: department.id,
           })),
         },
@@ -130,51 +130,64 @@ function addEmployee() {
   db.query("SELECT * FROM roles", (err, roles) => {
     if (err) throw err;
 
-    // prompt the user for information about the new employee
-    inquirer
-      .prompt([
-        {
-          type: "input",
-          name: "first_name",
-          message: "What is the new employee's first name?",
-        },
-        {
-          type: "input",
-          name: "last_name",
-          message: "What is the new employee's last name?",
-        },
-        {
-          type: "list",
-          name: "role_id",
-          message: "What is the new employee's role?",
-          choices: roles.map((role) => ({
-            name: role.title,
-            value: role.id,
-          })),
-        },
-        {
-          type: "input",
-          name: "manager_id",
-          message: "What is the new employee's manager's id?",
-        },
-      ])
-      .then((answer) => {
-        db.query(
-          "INSERT INTO employees SET ?",
-          {
-            first_name: answer.first_name,
-            last_name: answer.last_name,
-            role_id: answer.role_id,
-            manager_id: answer.manager_id,
-          },
-          (err) => {
-            if (err) throw err;
+    // query the employees table to get employee names and ids
+    db.query("SELECT * FROM employees", (err, employees) => {
+      if (err) throw err;
 
-            console.log("Employee added successfully!");
-            start();
-          }
-        );
-      });
+      // add an option for "None" or "N/A" to the employees list
+      const employeeChoices = employees.map((employee) => ({
+        name: `${employee.first_name} ${employee.last_name}`,
+        value: employee.id,
+      }));
+      employeeChoices.unshift({ name: "None", value: null });
+
+      // prompt the user for information about the new employee
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            name: "first_name",
+            message: "What is the new employee's first name?",
+          },
+          {
+            type: "input",
+            name: "last_name",
+            message: "What is the new employee's last name?",
+          },
+          {
+            type: "list",
+            name: "role_id",
+            message: "What is the new employee's role?",
+            choices: roles.map((role) => ({
+              name: role.job_title,
+              value: role.id,
+            })),
+          },
+          {
+            type: "list",
+            name: "manager_id",
+            message: "Who is the new employee's manager?",
+            choices: employeeChoices,
+          },
+        ])
+        .then((answer) => {
+          db.query(
+            "INSERT INTO employees SET ?",
+            {
+              first_name: answer.first_name,
+              last_name: answer.last_name,
+              role_id: answer.role_id,
+              manager_id: answer.manager_id,
+            },
+            (err) => {
+              if (err) throw err;
+
+              console.log("Employee added successfully!");
+              start();
+            }
+          );
+        });
+    });
   });
 }
 
@@ -188,6 +201,11 @@ function updateEmployeeRole() {
     db.query("SELECT * FROM employees", (err, employees) => {
       if (err) throw err;
 
+      const employeeChoices = employees.map((employee) => ({
+        name: `${employee.first_name} ${employee.last_name}`,
+        value: employee.id,
+      }));
+      employeeChoices.unshift({ name: "None", value: null });
       // prompt the user for information about the new employee
       inquirer
         .prompt([
@@ -205,13 +223,19 @@ function updateEmployeeRole() {
             name: "role_id",
             message: "What is the employee's new role?",
             choices: roles.map((role) => ({
-              name: role.title,
+              name: role.job_title,
               value: role.id,
             })),
           },
+          {
+            type: "list",
+            name: "manager_id",
+            message: "Who is the employees new manager?",
+            choices: employeeChoices,
+          },
         ])
         .then((answer) => {
-          db.query("UPDATE employees SET role_id = ? WHERE id = ?", [answer.role_id, answer.employee_id], (err) => {
+          db.query("UPDATE employees SET role_id = ?, manager_id = ? WHERE id = ?", [answer.role_id, answer.manager_id, answer.employee_id], (err) => {
             if (err) throw err;
 
             console.log("Employee role updated successfully!");
