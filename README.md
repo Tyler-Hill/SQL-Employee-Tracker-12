@@ -43,6 +43,8 @@ To start the application, run npm start in the terminal. You will be presented w
 
 ## Video of the application in use
 
+https://drive.google.com/file/d/147HrA3T3f6aPt-J9WTIoKwV4SkpqjNoq/view
+
 ## Contributing
 
 This application was developed as a learning exercise, and is not actively maintained. However, if you would like to contribute to the project, feel free to fork the repository and submit a pull request.
