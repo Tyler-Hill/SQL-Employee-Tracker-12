@@ -81,7 +81,7 @@ function addDepartment() {
 // function to add a role
 function addRole() {
   // Query the departments table to get department names and ids
-  connection.query("SELECT * FROM departments", (err, departments) => {
+  db.query("SELECT * FROM departments", (err, departments) => {
     if (err) throw err;
     // Prompt the user for the role information
     inquirer
@@ -128,7 +128,7 @@ function addRole() {
 // function to add an employee
 function addEmployee() {
   // query the roles table to get role titles and ids
-  connection.query("SELECT * FROM roles", (err, roles) => {
+  db.query("SELECT * FROM roles", (err, roles) => {
     if (err) throw err;
 
     // prompt the user for information about the new employee
@@ -182,7 +182,7 @@ function addEmployee() {
 // function to update an employee's role
 function updateEmployeeRole() {
   // query the roles table to get role titles and ids
-  connection.query("SELECT * FROM roles", (err, roles) => {
+  db.query("SELECT * FROM roles", (err, roles) => {
     if (err) throw err;
 
     // query the employees table to get employee names and ids
