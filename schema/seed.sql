@@ -1,15 +1,5 @@
-CREATE DATABASE movies_db;
+INSERT INTO movies (movie_name)
+VALUES ("Dune"), ("The Matrix"), ("Spaceballs"), ("Indiana Jones"), ("The Batman");
 
-USE movies_db;
-
-CREATE TABLE movies (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    movie_name VARCHAR(100) NOT NULL
-);
-
-CREATE TABLE reviews (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    movie_id INT,
-    review TEXT NOT NULL
-    FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE SET NULL
-)
+INSERT INTO reviews (movie_id, review)
+VALUES (1, "Pretty good"), (2, "Not bad"), (3, "Alright"), (4, "Old but gold"), (5, "A little dark");
