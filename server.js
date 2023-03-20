@@ -2,6 +2,7 @@
 const express = require("express");
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
+const consoleTable = require("console.table");
 require("dotenv").config();
 
 const PORT = 3001;
@@ -23,33 +24,31 @@ const db = mysql.createConnection(
 
 // function to view all departments
 function viewAllDepartments() {
-  db.query("SELECT * FROM departments", function (err, results) {
-    if (err) {
-      console.log(err);
-    }
-    console.log(results);
+  const query = "SELECT id, department_name AS name FROM departments";
+  db.query(query, function (err, res) {
+    if (err) throw err;
+    console.table(res);
+
     start();
   });
 }
 
 // function to view all roles
 function viewRoles() {
-  db.query("SELECT * FROM roles", function (err, results) {
-    if (err) {
-      console.log(err);
-    }
-    console.log(results);
+  const query = "SELECT roles.id, job_title AS title, salary, department_name AS department FROM roles JOIN departments ON roles.department_id = departments.id";
+  db.query(query, function (err, res) {
+    if (err) throw err;
+    console.table(res);
     start();
   });
 }
 
 // function to view all employees
 function viewEmployees() {
-  db.query("SELECT * FROM employees", function (err, results) {
-    if (err) {
-      console.log(err);
-    }
-    console.log(results);
+  const query = "SELECT employees.id, employees.first_name, employees.last_name, job_title AS role, department_name AS department, salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employees LEFT JOIN roles ON employees.role_id = roles.id LEFT JOIN departments ON roles.department_id = departments.id LEFT JOIN employees AS manager ON employees.manager_id = manager.id";
+  db.query(query, function (err, res) {
+    if (err) throw err;
+    console.table(res);
     start();
   });
 }
@@ -66,7 +65,7 @@ function addDepartment() {
       db.query(
         "INSERT INTO departments SET ?",
         {
-          name: answer.department,
+          department_name: answer.department,
         },
         (err) => {
           if (err) throw err;
@@ -110,7 +109,7 @@ function addRole() {
         db.query(
           "INSERT INTO roles SET ?",
           {
-            title: answer.title,
+            job_title: answer.title,
             salary: answer.salary,
             department_id: answer.department_id,
           },
@@ -160,7 +159,7 @@ function addEmployee() {
         },
       ])
       .then((answer) => {
-        connection.query(
+        db.query(
           "INSERT INTO employees SET ?",
           {
             first_name: answer.first_name,
@@ -186,7 +185,7 @@ function updateEmployeeRole() {
     if (err) throw err;
 
     // query the employees table to get employee names and ids
-    connection.query("SELECT * FROM employees", (err, employees) => {
+    db.query("SELECT * FROM employees", (err, employees) => {
       if (err) throw err;
 
       // prompt the user for information about the new employee
@@ -212,7 +211,7 @@ function updateEmployeeRole() {
           },
         ])
         .then((answer) => {
-          connection.query("UPDATE employees SET role_id = ? WHERE id = ?", [answer.role_id, answer.employee_id], (err) => {
+          db.query("UPDATE employees SET role_id = ? WHERE id = ?", [answer.role_id, answer.employee_id], (err) => {
             if (err) throw err;
 
             console.log("Employee role updated successfully!");
